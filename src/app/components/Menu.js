@@ -1,12 +1,13 @@
 
 'use client'
 
-import { Button, Col, Container, Form, FormControl, Nav, Navbar, InputGroup } from "react-bootstrap"
-import { FaSearch } from "react-icons/fa";
+import { Button, Col, Container, Form, FormControl, Nav, Navbar, InputGroup, NavDropdown } from "react-bootstrap"
+import { FaSearch, } from "react-icons/fa";
+import { BsCart2, BsHeart, BsPersonCircle } from "react-icons/bs";
 
 export default function Menu() {
     return (
-        <Navbar bg="dark" data-bs-theme="dark">
+        <Navbar style={{ background: '#13293D' }} data-bs-theme="dark">
             <Container className="mx-5" fluid>
                 <Navbar.Brand clas href="#home">
                     <img
@@ -23,18 +24,36 @@ export default function Menu() {
                             type="search"
                             placeholder="Pesquisar"
                             aria-label="Pesquisar"
-                            style={{width:  '300px'}}
+                            style={{
+                                width: '300px',
+                                borderColor: 'white',
+                                backgroundColor: 'white',
+                                color: 'black'
+                            }}
                         />
-                        <Button variant="outline-light">
-                            <FaSearch />
+                        <Button variant="light">
+                            <FaSearch size={20} />
                         </Button>
                     </InputGroup>
                 </Form>
 
-                <Nav>
-                    <Nav.Link href="/home">Active</Nav.Link>
-                    <Nav.Link href="/home">Active</Nav.Link>
-                    <Nav.Link href="/home">Active</Nav.Link>
+                <Nav className="p-1">
+                    <Nav.Link className="mt-1" href="/home"><BsHeart className="mx-2 mt-1" size={25} />Lista de Desejo</Nav.Link>
+                    <NavDropdown
+                        title={
+                            <>
+                                <BsPersonCircle className="mx-2" size={25} />
+                                Entrar
+                            </>
+                        }
+                        id="nav-dropdown"
+                        className="mt-1"
+                    >
+                        <NavDropdown.Item href="/login">Login</NavDropdown.Item>
+                        <NavDropdown.Item href="/signup">Cadastro</NavDropdown.Item>
+                        <NavDropdown.Item href="/profile">Perfil</NavDropdown.Item>
+                    </NavDropdown>
+                    <Nav.Link href="/home"><BsCart2 className="mx-3" size={30} /> </Nav.Link>
                 </Nav>
 
             </Container>
