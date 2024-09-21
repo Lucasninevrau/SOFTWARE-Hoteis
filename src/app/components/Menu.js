@@ -9,7 +9,7 @@ export default function Menu() {
     return (
         <Navbar style={{ background: '#13293D' }} data-bs-theme="dark">
             <Container className="mx-5" fluid>
-                <Navbar.Brand clas href="#home">
+                <Navbar.Brand clas href="/">
                     <img
                         src="/images/sportfy_logo.png"
                         height="50"
@@ -53,9 +53,8 @@ export default function Menu() {
                         <NavDropdown.Item href="/signup">Cadastro</NavDropdown.Item>
                         <NavDropdown.Item href="/profile">Perfil</NavDropdown.Item>
                     </NavDropdown>
-                    <Nav.Link href="/home"><BsCart2 className="mx-3" size={30} /> </Nav.Link>
+                    <Nav.Link href="/carrinho"><BsCart2 className="mx-3" size={30} /> </Nav.Link>
                 </Nav>
-
             </Container>
         </Navbar>
     )

@@ -2,7 +2,14 @@
 
 export default function Rodape() {
     return (
-        <div style={{ background: "#E8F1F2", height: "100px", display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '10px' }}>
+        <div style={{
+            background: "#E8F1F2",
+            height: "100px", display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '10px'
+        }}>
             <p style={{ margin: 0, fontFamily: 'Times New Roman', fontSize: '16px', fontWeight: 'bold' }}>
                 Copyright © 2024
             </p>
