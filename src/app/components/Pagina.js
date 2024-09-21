@@ -1,13 +1,15 @@
 import { Container } from "react-bootstrap";
 import Menu from "./Menu";
+import BannerHome from "./BannerHome";
 
 export default function Pagina(props){
     return(
         <>  
-            <Menu>
+            <Menu/>
+            
+            {props.showBanner && <BannerHome />}
 
-            </Menu>
-            <Container>
+            <Container style={{width: "100%"}}>
                 {props.children}
             </Container>
 
