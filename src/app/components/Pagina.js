@@ -10,7 +10,7 @@ export default function Pagina(props){
             
             {props.showBanner && <BannerHome />}
 
-            <Container style={{ minHeight: '900px' }} >
+            <Container style={{ minHeight: '500px' }} >
                 {props.children}
             </Container>
 
