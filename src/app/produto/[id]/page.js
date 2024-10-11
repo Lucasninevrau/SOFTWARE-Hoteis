@@ -4,6 +4,7 @@ import Pagina from "@/app/components/Pagina"
 import { useState } from "react";
 import { Button, Carousel, Col, Form, Image, Row } from "react-bootstrap";
 import { useRouter } from "next/navigation";
+import { BsHeart } from "react-icons/bs";
 
 export default function Page() {
 
@@ -109,8 +110,21 @@ export default function Page() {
 
                     <Button variant="success" className="w-100 mb-3" onClick={adicionarAoCarrinho}>Adicionar ao Carrinho</Button>
                     <Button variant="secondary" className="w-100" onClick={() => router.push('/')}>Continuar Comprando</Button>
+                    <BsHeart
+                        className="heart-icon w-100 mb-3 mt-4"
+                        size={25}
+                        onClick={() => alert(':)')}
+                        style={{
+                            color: '#000',
+                            transition: 'color 0.5s ease',
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.color = 'red'}
+                        onMouseLeave={(e) => e.currentTarget.style.color = '#000'}
+                    />
                 </Col>
             </Row>
         </Pagina>
     );
 }
+
+

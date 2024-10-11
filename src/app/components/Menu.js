@@ -38,7 +38,7 @@ export default function Menu() {
                 </Form>
 
                 <Nav className="p-1">
-                    <Nav.Link className="mt-1" href="/home"><BsHeart className="mx-2 mt-1" size={25} />Lista de Desejo</Nav.Link>
+                    <Nav.Link className="mt-1" href="/listadesejos"><BsHeart className="mx-2 mt-1" size={25} />Lista de Desejo</Nav.Link>
                     <NavDropdown
                         title={
                             <>
