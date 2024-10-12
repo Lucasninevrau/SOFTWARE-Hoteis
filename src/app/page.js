@@ -3,6 +3,7 @@
 import { Card, Col, Row } from "react-bootstrap";
 import Pagina from "./components/Pagina";
 import Link from "next/link";
+import { useEffect } from "react";
 
 export default function Home() {
 
@@ -16,6 +17,11 @@ export default function Home() {
     { id: 7, nome: 'Chuteira Society Umbro Neo Striker - Azul Royal+Branco', valor: '149.99', valorOriginal: '199.99', url: 'https://static.netshoes.com.br/produtos/chuteira-society-umbro-neo-striker/43/2IA-0489-543/2IA-0489-543_zoom2.jpg?ts=1710411616?ims=1088x' }
   ];
 
+  useEffect(() => {
+    // Remove a classe ao carregar a página inicial
+    document.body.classList.remove('body-login');
+  }, []);
+  
   return (
     <Pagina showBanner={true}>
       <Row>

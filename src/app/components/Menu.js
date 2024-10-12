@@ -1,15 +1,29 @@
-
 'use client'
 
-import { Button, Col, Container, Form, FormControl, Nav, Navbar, InputGroup, NavDropdown } from "react-bootstrap"
-import { FaSearch, } from "react-icons/fa";
+import { useEffect, useState } from 'react';
+import { Button, Container, Form, FormControl, Nav, Navbar, InputGroup, NavDropdown } from "react-bootstrap";
+import { FaSearch } from "react-icons/fa";
 import { BsCart2, BsHeart, BsPersonCircle } from "react-icons/bs";
 
 export default function Menu() {
+    const [usuarioLogado, setUsuarioLogado] = useState(null);
+
+    useEffect(() => {
+        const usuario = JSON.parse(localStorage.getItem('usuarioLogado')); // Mudei para 'usuarioLogado'
+        if (usuario) {
+            setUsuarioLogado(usuario.usuario); // Acessando a propriedade correta
+        }
+    }, []);
+    
+    const handleLogout = () => {
+        localStorage.removeItem('usuarioLogado'); 
+        setUsuarioLogado(null); 
+    };
+
     return (
         <Navbar style={{ background: '#13293D' }} data-bs-theme="dark">
             <Container className="mx-5" fluid>
-                <Navbar.Brand clas href="/">
+                <Navbar.Brand href="/">
                     <img
                         src="/images/sportfy_logo.png"
                         height="50"
@@ -38,24 +52,37 @@ export default function Menu() {
                 </Form>
 
                 <Nav className="p-1">
-                    <Nav.Link className="mt-1" href="/listadesejos"><BsHeart className="mx-2 mt-1" size={25} />Lista de Desejo</Nav.Link>
+                    <Nav.Link className="mt-1" href="/listadesejos">
+                        <BsHeart className="mx-2 mt-1" size={25} />Lista de Desejo
+                    </Nav.Link>
+
                     <NavDropdown
                         title={
                             <>
                                 <BsPersonCircle className="mx-2" size={25} />
-                                Entrar
+                                {usuarioLogado ? usuarioLogado : 'Entrar'}
                             </>
                         }
                         id="nav-dropdown"
                         className="mt-1"
                     >
-                        <NavDropdown.Item href="/login">Login</NavDropdown.Item>
-                        <NavDropdown.Item href="/signup">Cadastro</NavDropdown.Item>
-                        <NavDropdown.Item href="/profile">Perfil</NavDropdown.Item>
+                        {/* Se estiver logado, exibe "Perfil" e "Logout" */}
+                        {usuarioLogado ? (
+                            <>
+                                <NavDropdown.Item href="/profile">Perfil</NavDropdown.Item>
+                                <NavDropdown.Item onClick={handleLogout}>Sair</NavDropdown.Item>
+                            </>
+                        ) : (
+                            <>
+                                <NavDropdown.Item href="/login">Login</NavDropdown.Item>
+                                <NavDropdown.Item href="/register">Cadastro</NavDropdown.Item>
+                            </>
+                        )}
                     </NavDropdown>
+
                     <Nav.Link href="/carrinho"><BsCart2 className="mx-3" size={30} /> </Nav.Link>
                 </Nav>
             </Container>
         </Navbar>
-    )
+    );
 }
