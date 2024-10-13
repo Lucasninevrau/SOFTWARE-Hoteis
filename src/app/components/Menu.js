@@ -63,6 +63,7 @@ export default function Menu() {
                             <NavDropdown.Item href="/cadastro/categorias">Cadastrar Categoria</NavDropdown.Item>
                             <NavDropdown.Item href="/cadastro/marcas">Cadastrar Marca</NavDropdown.Item>
                             <NavDropdown.Item href="/cadastro/tamanhos">Cadastrar Tamanhos</NavDropdown.Item>
+                            <NavDropdown.Item href="/cadastro/cupons">Cadastrar Cupom</NavDropdown.Item>
                         </NavDropdown>
                     )}
 

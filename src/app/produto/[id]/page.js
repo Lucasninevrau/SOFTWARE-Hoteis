@@ -9,8 +9,9 @@ import { BsHeart } from "react-icons/bs";
 export default function Page() {
   const [produto, setProduto] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [tamanhoSelecionado, setTamanhoSelecionado] = useState('M');
+  const [tamanhoSelecionado, setTamanhoSelecionado] = useState('');
   const [quantidade, setQuantidade] = useState(1);
+  const [tamanhos, setTamanhos] = useState([]); // Estado para tamanhos
   const router = useRouter();
   const { id } = useParams(); 
 
@@ -21,10 +22,15 @@ export default function Page() {
 
     if (produtoEncontrado) {
       setProduto(produtoEncontrado);
+      setTamanhoSelecionado(produtoEncontrado.tamanho || ''); // Define o tamanho selecionado com base no produto, se existir
     } else {
       // Redireciona para a página inicial se o produto não for encontrado
       router.push('/');
     }
+
+    // Carregar tamanhos do localStorage
+    const tamanhosSalvos = JSON.parse(localStorage.getItem('tamanhos')) || [];
+    setTamanhos(tamanhosSalvos);
   }, [id, router]);
 
   const handleSelect = (selectedIndex) => {
@@ -32,9 +38,38 @@ export default function Page() {
   };
 
   const adicionarAoCarrinho = () => {
-    console.log(`Produto: ${produto.nome}, Tamanho: ${tamanhoSelecionado}, Quantidade: ${quantidade}`);
+    // Monta o objeto do produto para adicionar ao carrinho
+    const produtoCarrinho = {
+      ...produto,
+      tamanho: tamanhoSelecionado, // Adiciona o tamanho selecionado
+      quantidade: quantidade // Adiciona a quantidade selecionada
+    };
+
+    // Obtém o carrinho existente do localStorage ou inicia um novo array
+    const carrinhoExistente = JSON.parse(localStorage.getItem('carrinho')) || [];
+
+    // Verifica se o produto já existe no carrinho
+    const produtoExistente = carrinhoExistente.find(item => 
+        item.id === produtoCarrinho.id &&
+        item.tamanho === produtoCarrinho.tamanho &&
+        item.nome === produtoCarrinho.nome
+    );
+
+    if (produtoExistente) {
+        // Se o produto já existe, apenas aumenta a quantidade
+        produtoExistente.quantidade += quantidade; // Acumula a quantidade
+    } else {
+        // Se o produto não existe, adiciona ao carrinho
+        carrinhoExistente.push(produtoCarrinho);
+    }
+
+    // Atualiza o localStorage com o novo carrinho
+    localStorage.setItem('carrinho', JSON.stringify(carrinhoExistente));
+
+    console.log(`Produto adicionado ao carrinho:`, produtoCarrinho);
     router.push('/carrinho');
-  };
+};
+
 
   if (!produto) {
     return <div>Carregando...</div>;
@@ -95,8 +130,9 @@ export default function Page() {
                 value={tamanhoSelecionado}
                 onChange={(e) => setTamanhoSelecionado(e.target.value)}
               >
-                {['P', 'M', 'G', 'GG'].map(tamanho => (
-                  <option key={tamanho} value={tamanho}>{tamanho}</option>
+                <option value="">Selecione um tamanho</option>
+                {tamanhos.map(tamanho => (
+                  <option key={tamanho.id} value={tamanho.tamanho}>{tamanho.tamanho}</option>
                 ))}
               </Form.Control>
             </Col>

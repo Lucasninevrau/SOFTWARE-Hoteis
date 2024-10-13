@@ -241,24 +241,28 @@ export default function CadastrarProduto() {
           </Card>
         </Col>
         <Col>
-          <Card className="p-4">
-            <h2 className="text-center mb-4">Produtos Cadastrados</h2>
-            <ul className="list-unstyled">
-              {produtos.map(produto => (
-                <li key={produto.id} className="d-flex align-items-center justify-content-between mb-3">
-                  <div style={{ width: '50px', height: '50px', borderRadius: '8px', overflow: 'hidden', marginRight: '10px' }}>
-                    <img src={produto.urlPrincipal} alt={produto.nome} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  </div>
-                  <Button variant="link" onClick={() => selecionarProduto(produto)} className="flex-grow-1">
-                    {produto.nome} - {produto.marca} - {produto.categoria}
-                  </Button>
-                  <Button variant="link" onClick={() => handleShowModalConfirmacao(produto.id)} className="text-danger">
-                    <FaTrash />
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          </Card>
+          {usuarioMaster ? ( // Validação para produtos cadastrados
+            <Card className="p-4">
+              <h2 className="text-center mb-4">Produtos Cadastrados</h2>
+              <ul className="list-unstyled">
+                {produtos.map(produto => (
+                  <li key={produto.id} className="d-flex align-items-center justify-content-between mb-3">
+                    <div style={{ width: '50px', height: '50px', borderRadius: '8px', overflow: 'hidden', marginRight: '10px' }}>
+                      <img src={produto.urlPrincipal} alt={produto.nome} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    </div>
+                    <Button variant="link" onClick={() => selecionarProduto(produto)} className="flex-grow-1">
+                      {produto.nome} - {produto.marca} - {produto.categoria}
+                    </Button>
+                    <Button variant="link" onClick={() => handleShowModalConfirmacao(produto.id)} className="text-danger">
+                      <FaTrash />
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          ) : (
+            <p></p>
+          )}
         </Col>
       </Row>
 

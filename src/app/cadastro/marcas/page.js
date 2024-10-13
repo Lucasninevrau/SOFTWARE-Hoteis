@@ -132,6 +132,7 @@ export default function CadastrarMarca() {
         </Col>
 
         <Col md={6}>
+        {usuarioMaster ? (
           <Card className="p-4 shadow-lg">
             <h2 className="text-center mb-4">Marcas Cadastradas</h2>
             <ul className="list-unstyled">
@@ -147,6 +148,9 @@ export default function CadastrarMarca() {
               ))}
             </ul>
           </Card>
+          ) : (
+            <p></p>
+          )}
         </Col>
       </Row>
 

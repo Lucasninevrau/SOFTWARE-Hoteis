@@ -132,6 +132,7 @@ export default function CadastrarCategoria() {
         </Col>
 
         <Col md={6}>
+        {usuarioMaster ? (
           <Card className="p-4 shadow-lg">
             <h2 className="text-center mb-4">Categorias Cadastradas</h2>
             <ul className="list-unstyled">
@@ -147,6 +148,9 @@ export default function CadastrarCategoria() {
               ))}
             </ul>
           </Card>
+          ) : (
+            <p></p>
+          )}
         </Col>
       </Row>
 

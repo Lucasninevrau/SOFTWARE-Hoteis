@@ -120,6 +120,7 @@ export default function CadastrarTamanho() {
                 </Col>
 
                 <Col md={6}>
+                {usuarioMaster ? (
                     <Card className="p-4 shadow-lg">
                         <h2 className="text-center mb-4">Tamanhos Cadastrados</h2>
                         <ul className="list-unstyled">
@@ -135,6 +136,9 @@ export default function CadastrarTamanho() {
                             ))}
                         </ul>
                     </Card>
+                    ) : (
+                        <p></p>
+                      )}
                 </Col>
             </Row>
         </Container>
