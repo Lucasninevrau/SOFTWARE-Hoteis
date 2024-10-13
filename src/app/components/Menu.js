@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { useEffect, useState } from 'react';
 import { Button, Container, Form, FormControl, Nav, Navbar, InputGroup, NavDropdown } from "react-bootstrap";
@@ -9,9 +9,9 @@ export default function Menu() {
     const [usuarioLogado, setUsuarioLogado] = useState(null);
 
     useEffect(() => {
-        const usuario = JSON.parse(localStorage.getItem('usuarioLogado')); // Mudei para 'usuarioLogado'
+        const usuario = JSON.parse(localStorage.getItem('usuarioLogado'));
         if (usuario) {
-            setUsuarioLogado(usuario.usuario); // Acessando a propriedade correta
+            setUsuarioLogado(usuario.usuario); // Armazena o nome do usuário logado
         }
     }, []);
     
@@ -56,6 +56,16 @@ export default function Menu() {
                         <BsHeart className="mx-2 mt-1" size={25} />Lista de Desejo
                     </Nav.Link>
 
+                    {/* Menu Dropdown para Cadastros */}
+                    {usuarioLogado === 'master' && (
+                        <NavDropdown title="Cadastros" id="nav-dropdown" className="mt-1">
+                            <NavDropdown.Item href="/cadastro/produtos">Cadastrar Produto</NavDropdown.Item>
+                            <NavDropdown.Item href="/cadastro/categorias">Cadastrar Categoria</NavDropdown.Item>
+                            <NavDropdown.Item href="/cadastro/marcas">Cadastrar Marca</NavDropdown.Item>
+                            <NavDropdown.Item href="/cadastro/tamanhos">Cadastrar Tamanhos</NavDropdown.Item>
+                        </NavDropdown>
+                    )}
+
                     <NavDropdown
                         title={
                             <>
@@ -63,10 +73,9 @@ export default function Menu() {
                                 {usuarioLogado ? usuarioLogado : 'Entrar'}
                             </>
                         }
-                        id="nav-dropdown"
+                        id="nav-dropdown-user"
                         className="mt-1"
                     >
-                        {/* Se estiver logado, exibe "Perfil" e "Logout" */}
                         {usuarioLogado ? (
                             <>
                                 <NavDropdown.Item href="/profile">Perfil</NavDropdown.Item>
