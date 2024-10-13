@@ -1,61 +1,129 @@
-
-'use client'
-
-import { Button, Col, Container, Form, FormControl, Nav, Navbar, InputGroup, NavDropdown } from "react-bootstrap"
-import { FaSearch, } from "react-icons/fa";
-import { BsCart2, BsHeart, BsPersonCircle } from "react-icons/bs";
+import { useEffect, useState } from 'react';
+import { Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
+import { BsCart2, BsClipboard, BsHeart, BsPersonCircle } from "react-icons/bs";
+import Select from 'react-select';
 
 export default function Menu() {
+    const [usuarioLogado, setUsuarioLogado] = useState(null);
+    const [produtos, setProdutos] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    useEffect(() => {
+        const usuario = JSON.parse(localStorage.getItem('usuarioLogado'));
+        if (usuario) {
+            setUsuarioLogado(usuario.usuario);
+        }
+
+        const produtosCadastrados = JSON.parse(localStorage.getItem('produtos')) || [];
+        setProdutos(produtosCadastrados.map(produto => ({ value: produto.nome, label: produto.nome, urlPrincipal: produto.urlPrincipal })));
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem('usuarioLogado');
+        setUsuarioLogado(null);
+    };
+
+    const handleSearchChange = (selectedOption) => {
+        if (selectedOption) {
+            setSearchTerm(selectedOption.value);
+        } else {
+            setSearchTerm('');
+        }
+    };
+
+    const formatOptionLabel = ({ label, urlPrincipal }) => (
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+            <img
+                src={urlPrincipal}
+                alt={label}
+                style={{ width: '30px', height: '30px', marginRight: '10px', borderRadius: '4px' }}
+            />
+            <span>{label}</span>
+        </div>
+    );
+
     return (
-        <Navbar style={{ background: '#13293D' }} data-bs-theme="dark">
-            <Container className="mx-5" fluid>
-                <Navbar.Brand clas href="/">
-                    <img
-                        src="/images/sportfy_logo.png"
-                        height="50"
-                        className="d-inline-block align-top"
-                        alt="React Bootstrap logo"
-                    />
-                </Navbar.Brand>
-
-                <Form className="d-flex">
-                    <InputGroup>
-                        <FormControl
-                            type="search"
-                            placeholder="Pesquisar"
-                            aria-label="Pesquisar"
-                            style={{
-                                width: '300px',
-                                borderColor: 'white',
-                                backgroundColor: 'white',
-                                color: 'black'
-                            }}
+        <div style={{ background: '#13293D' }}>
+            <Container style={{ background: '#13293D' }}>
+                <Navbar expand="lg" data-bs-theme="dark">
+                    <Navbar.Brand href="/">
+                        <img
+                            src="/images/sportfy_logo.png"
+                            height="50"
+                            className="d-inline-block align-top"
+                            alt="Logo"
                         />
-                        <Button variant="light">
-                            <FaSearch size={20} />
-                        </Button>
-                    </InputGroup>
-                </Form>
+                    </Navbar.Brand>
 
-                <Nav className="p-1">
-                    <Nav.Link className="mt-1" href="/home"><BsHeart className="mx-2 mt-1" size={25} />Lista de Desejo</Nav.Link>
-                    <NavDropdown
-                        title={
-                            <>
-                                <BsPersonCircle className="mx-2" size={25} />
-                                Entrar
-                            </>
-                        }
-                        id="nav-dropdown"
-                        className="mt-1"
-                    >
-                        <NavDropdown.Item href="/login">Login</NavDropdown.Item>
-                        <NavDropdown.Item href="/signup">Cadastro</NavDropdown.Item>
-                        <NavDropdown.Item href="/profile">Perfil</NavDropdown.Item>
-                    </NavDropdown>
-                    <Nav.Link href="/carrinho"><BsCart2 className="mx-3" size={30} /> </Nav.Link>
-                </Nav>
+                    <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+                    <Navbar.Collapse id="responsive-navbar-nav" className="justify-content-center">
+                        <div style={{ flex: 1, display: 'flex', justifyContent: 'center', width: '100%' }}>
+                            <div style={{ maxWidth: '400px', width: '100%' }}>
+                                <Select
+                                    options={produtos}
+                                    onChange={handleSearchChange}
+                                    placeholder="Pesquisar produtos"
+                                    isClearable
+                                    isSearchable
+                                    noOptionsMessage={() => "Nenhum produto encontrado"}
+                                    formatOptionLabel={formatOptionLabel}
+                                    styles={{
+                                        control: (provided) => ({
+                                            ...provided,
+                                            borderColor: 'white',
+                                            backgroundColor: 'white',
+                                        }),
+                                    }}
+                                />
+                            </div>
+                        </div>
+
+                        <Nav className="ms-auto">
+                            <Nav.Link href="/listadesejos" className="d-none d-lg-block">
+                                <BsHeart className="mx-2" size={25} /> Lista de Desejo
+                            </Nav.Link>
+
+
+                            <Nav.Link href="/carrinho" className="d-none d-lg-block">
+                                <BsCart2 className="mx-3" size={30} /> Carrinho
+                            </Nav.Link>
+
+                            {/* Menu Dropdown para Cadastros */}
+                            {usuarioLogado === 'master' && (
+                                <NavDropdown title={<><BsClipboard className="me-2" size={25} /> Cadastros</>} id="nav-dropdown" >
+                                    <NavDropdown.Item href="/cadastro/produtos">Cadastrar Produto</NavDropdown.Item>
+                                    <NavDropdown.Item href="/cadastro/categorias">Cadastrar Categoria</NavDropdown.Item>
+                                    <NavDropdown.Item href="/cadastro/marcas">Cadastrar Marca</NavDropdown.Item>
+                                    <NavDropdown.Item href="/cadastro/tamanhos">Cadastrar Tamanhos</NavDropdown.Item>
+                                    <NavDropdown.Item href="/cadastro/cupons">Cadastrar Cupom</NavDropdown.Item>
+                                </NavDropdown>
+                            )}
+                            
+                            <NavDropdown title={<><BsPersonCircle className="mx-2" size={25} />{usuarioLogado ? usuarioLogado : 'Entrar'}</>} id="nav-dropdown">
+                                {usuarioLogado ? (
+                                    <>
+                                        <NavDropdown.Item href="/profile">Perfil</NavDropdown.Item>
+                                        <NavDropdown.Item onClick={handleLogout}>Sair</NavDropdown.Item>
+                                    </>
+                                ) : (
+                                    <>
+                                        <NavDropdown.Item href="/login">Login</NavDropdown.Item>
+                                        <NavDropdown.Item href="/register">Cadastro</NavDropdown.Item>
+                                    </>
+                                )}
+                            </NavDropdown>
+
+                            {/* Ícones visíveis no mobile */}
+                            <Nav.Link href="/listadesejos" className="d-lg-none">
+                                <BsHeart className="mx-2" size={25} />
+                            </Nav.Link>
+                            <Nav.Link href="/carrinho" className="d-lg-none">
+                                <BsCart2 className="mx-3" size={30} />
+                            </Nav.Link>
+                        </Nav>
+                    </Navbar.Collapse>
+                </Navbar>
             </Container>
-        </Navbar>
-    )
+        </div>
+    );
 }

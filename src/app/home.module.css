@@ -1,0 +1,9 @@
+/* styles/globals.css */
+.cardHover {
+    transition: border 0.1s ease;
+  }
+  
+  .cardHover:hover {
+    border: 2px solid green;
+  }
+  
