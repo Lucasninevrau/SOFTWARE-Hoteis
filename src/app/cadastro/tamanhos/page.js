@@ -1,9 +1,10 @@
-'use client'; // Certifique-se de usar isso para que o hook do router funcione
+'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Form, Button, Container, Row, Col, Card, Alert, Spinner } from 'react-bootstrap';
 import { FaTrash } from 'react-icons/fa';
+import Pagina from '@/app/components/Pagina';
 
 export default function CadastrarTamanho() {
     const [tamanho, setTamanho] = useState('');
@@ -82,6 +83,7 @@ export default function CadastrarTamanho() {
     }
 
     return (
+        <Pagina>
         <Container className="my-5">
             <Row className="justify-content-center">
                 <Col md={6}>
@@ -142,5 +144,6 @@ export default function CadastrarTamanho() {
                 </Col>
             </Row>
         </Container>
+        </Pagina>
     );
 }

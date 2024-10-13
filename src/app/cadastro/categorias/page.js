@@ -1,28 +1,29 @@
-'use client'; // Certifique-se de usar isso para que o hook do router funcione
+'use client'; 
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation'; // Hook correto no sistema app
+import { useRouter } from 'next/navigation'; 
 import { Form, Button, Container, Row, Col, Card, Alert, Spinner, Modal } from 'react-bootstrap';
-import { FaTrash } from 'react-icons/fa'; // Importando o ícone de lixeira
+import { FaTrash } from 'react-icons/fa'; 
+import Pagina from '@/app/components/Pagina';
 
 export default function CadastrarCategoria() {
   const [nome, setNome] = useState('');
-  const [categorias, setCategorias] = useState([]); // Para armazenar as categorias cadastradas
-  const [usuarioMaster, setUsuarioMaster] = useState(null); // Inicialmente nulo para esperar a verificação
-  const [categoriaSelecionada, setCategoriaSelecionada] = useState(null); // Para armazenar a categoria que será editada
-  const [modalConfirmacaoVisible, setModalConfirmacaoVisible] = useState(false); // Para controlar a exibição do modal de confirmação
-  const [categoriaParaExcluir, setCategoriaParaExcluir] = useState(null); // Categoria que será excluída
+  const [categorias, setCategorias] = useState([]); 
+  const [usuarioMaster, setUsuarioMaster] = useState(null);
+  const [categoriaSelecionada, setCategoriaSelecionada] = useState(null); 
+  const [modalConfirmacaoVisible, setModalConfirmacaoVisible] = useState(false);
+  const [categoriaParaExcluir, setCategoriaParaExcluir] = useState(null); 
 
-  const router = useRouter(); // Use o hook correto para navegação
+  const router = useRouter();
 
   useEffect(() => {
     const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado'));
     
     // Verifica se o usuário é o "master"
     if (usuarioLogado && usuarioLogado.usuario === 'master') {
-      setUsuarioMaster(true); // Define que o usuário é master
+      setUsuarioMaster(true); 
     } else {
-      setUsuarioMaster(false); // Define que o usuário não é master
+      setUsuarioMaster(false); 
     }
 
     // Carrega as categorias do localStorage
@@ -35,16 +36,16 @@ export default function CadastrarCategoria() {
     const categoriasCadastradas = JSON.parse(localStorage.getItem('categorias')) || [];
     
     if (categoriaSelecionada) {
-      // Editar categoria existente
+      
       const categoriaEditada = categoriasCadastradas.map(categoria => 
         categoria.id === categoriaSelecionada.id ? { ...categoria, nome } : categoria
       );
       localStorage.setItem('categorias', JSON.stringify(categoriaEditada));
       setCategorias(categoriaEditada);
       alert('Categoria editada com sucesso!');
-      setCategoriaSelecionada(null); // Limpa a seleção
+      setCategoriaSelecionada(null); 
     } else {
-      // Cadastrar nova categoria
+      
       const novaCategoria = {
         id: categoriasCadastradas.length + 1,
         nome,
@@ -55,7 +56,7 @@ export default function CadastrarCategoria() {
       setCategorias(categoriasCadastradas);
       alert('Categoria cadastrada com sucesso!');
     }
-    setNome(''); // Limpa o campo após o cadastro
+    setNome('');
   };
 
   const editarCategoria = (categoria) => {
@@ -98,6 +99,7 @@ export default function CadastrarCategoria() {
   }
 
   return (
+    <Pagina>
     <Container className="my-5">
       <Row className="justify-content-center">
         <Col md={6}>
@@ -168,5 +170,6 @@ export default function CadastrarCategoria() {
         </Modal.Footer>
       </Modal>
     </Container>
+    </Pagina>
   );
 }

@@ -1,28 +1,29 @@
-'use client'; // Certifique-se de usar isso para que o hook do router funcione
+'use client'; 
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation'; // Hook correto no sistema app
+import { useRouter } from 'next/navigation'; 
 import { Form, Button, Container, Row, Col, Card, Alert, Spinner, Modal } from 'react-bootstrap';
-import { FaTrash } from 'react-icons/fa'; // Importando o ícone de lixeira
+import { FaTrash } from 'react-icons/fa'; 
+import Pagina from '@/app/components/Pagina';
 
 export default function CadastrarMarca() {
   const [nome, setNome] = useState('');
-  const [marcas, setMarcas] = useState([]); // Para armazenar as marcas cadastradas
-  const [usuarioMaster, setUsuarioMaster] = useState(null); // Inicialmente nulo para esperar a verificação
-  const [marcaSelecionada, setMarcaSelecionada] = useState(null); // Para armazenar a marca que será editada
-  const [modalConfirmacaoVisible, setModalConfirmacaoVisible] = useState(false); // Para controlar a exibição do modal de confirmação
-  const [marcaParaExcluir, setMarcaParaExcluir] = useState(null); // Marca que será excluída
+  const [marcas, setMarcas] = useState([]); 
+  const [usuarioMaster, setUsuarioMaster] = useState(null); 
+  const [marcaSelecionada, setMarcaSelecionada] = useState(null); 
+  const [modalConfirmacaoVisible, setModalConfirmacaoVisible] = useState(false); 
+  const [marcaParaExcluir, setMarcaParaExcluir] = useState(null); 
 
-  const router = useRouter(); // Use o hook correto para navegação
+  const router = useRouter(); 
 
   useEffect(() => {
     const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado'));
     
     // Verifica se o usuário é o "master"
     if (usuarioLogado && usuarioLogado.usuario === 'master') {
-      setUsuarioMaster(true); // Define que o usuário é master
+      setUsuarioMaster(true); 
     } else {
-      setUsuarioMaster(false); // Define que o usuário não é master
+      setUsuarioMaster(false); 
     }
 
     // Carrega as marcas do localStorage
@@ -42,7 +43,7 @@ export default function CadastrarMarca() {
       localStorage.setItem('marcas', JSON.stringify(marcaEditada));
       setMarcas(marcaEditada);
       alert('Marca editada com sucesso!');
-      setMarcaSelecionada(null); // Limpa a seleção
+      setMarcaSelecionada(null); 
     } else {
       // Cadastrar nova marca
       const novaMarca = {
@@ -55,7 +56,7 @@ export default function CadastrarMarca() {
       setMarcas(marcasCadastradas);
       alert('Marca cadastrada com sucesso!');
     }
-    setNome(''); // Limpa o campo após o cadastro
+    setNome(''); 
   };
 
   const editarMarca = (marca) => {
@@ -98,6 +99,7 @@ export default function CadastrarMarca() {
   }
 
   return (
+    <Pagina>
     <Container className="my-5">
       <Row className="justify-content-center">
         <Col md={6}>
@@ -168,5 +170,6 @@ export default function CadastrarMarca() {
         </Modal.Footer>
       </Modal>
     </Container>
+    </Pagina>
   );
 }

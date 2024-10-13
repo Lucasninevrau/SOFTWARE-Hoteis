@@ -3,7 +3,7 @@
 import Pagina from "@/app/components/Pagina";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { Button, Card, Col, Form, InputGroup, Row, Alert, Modal } from "react-bootstrap"; 
+import { Button, Card, Col, Form, InputGroup, Row, Alert, Modal } from "react-bootstrap";
 import { BsPlusCircleFill, BsDashCircle, BsTrash } from "react-icons/bs";
 
 export default function Page() {
@@ -17,18 +17,18 @@ export default function Page() {
     const [mostrarModal, setMostrarModal] = useState(false);
     const [numeroCasa, setNumeroCasa] = useState('');
     const [complemento, setComplemento] = useState('');
-    const [loading, setLoading] = useState(true); // Estado para controle de carregamento
-    const [isRedirecting, setIsRedirecting] = useState(false); // Estado para controlar redirecionamento
+    const [loading, setLoading] = useState(true); 
+    const [isRedirecting, setIsRedirecting] = useState(false); 
     const router = useRouter();
 
     useEffect(() => {
-        const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado')); // Verifique a chave correta
+        const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado')); 
 
         if (!usuarioLogado) {
-            // Se não estiver logado, redirecionar para a tela de login
-            setIsRedirecting(true); // Inicia o redirecionamento
-            router.push('/login'); // Redireciona para a página de login
-            return; // Saia da função
+            
+            setIsRedirecting(true); 
+            router.push('/login'); 
+            return; 
         }
 
         const carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
@@ -41,7 +41,7 @@ export default function Page() {
             return acc;
         }, {});
         setProdutosCarrinho(Object.values(produtosConsolidados));
-        setLoading(false); // Define loading como false após carregar os produtos
+        setLoading(false); 
     }, [router]);
 
     const adicionarAoCarrinho = (produto) => {
@@ -68,7 +68,7 @@ export default function Page() {
                 if (item.id === produto.id && item.tamanho === produto.tamanho && item.nome === produto.nome && item.valor === produto.valor) {
                     const novaQuantidade = action === 'increment' ? (item.quantidade || 1) + 1 : Math.max((item.quantidade || 1) - 1, 0);
                     if (novaQuantidade === 0) {
-                        return null; 
+                        return null;
                     }
                     return { ...item, quantidade: novaQuantidade };
                 }
@@ -125,9 +125,9 @@ export default function Page() {
                     setFrete(0);
                 } else {
                     setEndereco(`${data.logradouro}, ${data.bairro}, ${data.localidade} - ${data.uf}`);
-                    const valorFrete = 15.00; // Exemplo de valor de frete
+                    const valorFrete = 15.00;
                     setFrete(valorFrete);
-                    // Armazenar o endereço no localStorage
+                   
                     localStorage.setItem('endereco', JSON.stringify({
                         logradouro: data.logradouro,
                         bairro: data.bairro,
@@ -151,20 +151,20 @@ export default function Page() {
     // Função para cadastrar o endereço
     const cadastrarEndereco = () => {
         const enderecoExistente = JSON.parse(localStorage.getItem('endereco')) || {};
-    
+
         const enderecoCompleto = {
             ...enderecoExistente,
             numero: numeroCasa,
             complemento: complemento,
         };
-        
+
         localStorage.setItem('endereco', JSON.stringify(enderecoCompleto));
         setMensagem('Endereço cadastrado com sucesso!');
         setMostrarModal(false);
         setNumeroCasa('');
         setComplemento('');
     };
-    
+
 
     return (
         <Pagina>
@@ -234,8 +234,8 @@ export default function Page() {
                             <Row className="mb-2">
                                 <Col><strong>Valor Final:</strong></Col>
                                 <Col className="text-end">R$: {(
-                                    produtosCarrinho.reduce((acc, item) => acc + (item.quantidade || 1) * item.valor, 0) 
-                                    - desconto + frete // Inclui o frete
+                                    produtosCarrinho.reduce((acc, item) => acc + (item.quantidade || 1) * item.valor, 0)
+                                    - desconto + frete
                                 ).toFixed(2)}</Col>
                             </Row>
                             <Row className="mb-3">
@@ -280,7 +280,14 @@ export default function Page() {
                             )}
                             <Row>
                                 <Col>
-                                    <Button variant="success" className="w-100 mb-2">Finalizar Compra</Button>
+                                    <Button
+                                        variant="success"
+                                        className="w-100 mb-2"
+                                        onClick={() => router.push('/pagamento')}
+                                    >
+                                        Finalizar Compra
+                                    </Button>
+
                                 </Col>
                             </Row>
                             <Row>
@@ -318,19 +325,19 @@ export default function Page() {
                         </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Label>Nº da Casa/Apartamento/Lote</Form.Label>
-                            <Form.Control 
-                                type="text" 
-                                value={numeroCasa} 
-                                onChange={(e) => setNumeroCasa(e.target.value)} 
-                                required 
+                            <Form.Control
+                                type="text"
+                                value={numeroCasa}
+                                onChange={(e) => setNumeroCasa(e.target.value)}
+                                required
                             />
                         </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Label>Complemento</Form.Label>
-                            <Form.Control 
-                                type="text" 
-                                value={complemento} 
-                                onChange={(e) => setComplemento(e.target.value)} 
+                            <Form.Control
+                                type="text"
+                                value={complemento}
+                                onChange={(e) => setComplemento(e.target.value)}
                             />
                         </Form.Group>
                     </Form>

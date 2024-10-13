@@ -1,29 +1,30 @@
-'use client'; // Certifique-se de usar isso para que o hook do router funcione
+'use client'; 
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation'; // Hook correto no sistema app
+import { useRouter } from 'next/navigation'; 
 import { Form, Button, Container, Row, Col, Card, Alert, Spinner, Modal } from 'react-bootstrap';
-import { FaTrash } from 'react-icons/fa'; // Importando o ícone de lixeira
+import { FaTrash } from 'react-icons/fa'; 
+import Pagina from '@/app/components/Pagina';
 
 export default function CadastrarCupom() {
     const [nome, setNome] = useState('');
     const [valor, setValor] = useState('');
-    const [cupons, setCupons] = useState([]); // Para armazenar os cupons cadastrados
-    const [usuarioMaster, setUsuarioMaster] = useState(null); // Inicialmente nulo para esperar a verificação
-    const [cupomSelecionado, setCupomSelecionado] = useState(null); // Para armazenar o cupom que será editado
-    const [modalConfirmacaoVisible, setModalConfirmacaoVisible] = useState(false); // Para controlar a exibição do modal de confirmação
-    const [cupomParaExcluir, setCupomParaExcluir] = useState(null); // Cupom que será excluído
+    const [cupons, setCupons] = useState([]); 
+    const [usuarioMaster, setUsuarioMaster] = useState(null); 
+    const [cupomSelecionado, setCupomSelecionado] = useState(null); 
+    const [modalConfirmacaoVisible, setModalConfirmacaoVisible] = useState(false); 
+    const [cupomParaExcluir, setCupomParaExcluir] = useState(null); 
 
-    const router = useRouter(); // Use o hook correto para navegação
+    const router = useRouter(); 
 
     useEffect(() => {
         const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado'));
 
         // Verifica se o usuário é o "master"
         if (usuarioLogado && usuarioLogado.usuario === 'master') {
-            setUsuarioMaster(true); // Define que o usuário é master
+            setUsuarioMaster(true); 
         } else {
-            setUsuarioMaster(false); // Define que o usuário não é master
+            setUsuarioMaster(false); 
         }
 
         // Carrega os cupons do localStorage
@@ -43,13 +44,13 @@ export default function CadastrarCupom() {
             localStorage.setItem('cupons', JSON.stringify(cupomEditado));
             setCupons(cupomEditado);
             alert('Cupom editado com sucesso!');
-            setCupomSelecionado(null); // Limpa a seleção
+            setCupomSelecionado(null); 
         } else {
             // Cadastrar novo cupom
             const novaCategoria = {
                 id: cuponsCadastrados.length + 1,
                 nome,
-                valor: parseFloat(valor), // Armazenando o valor como número
+                valor: parseFloat(valor), 
             };
 
             cuponsCadastrados.push(novaCategoria);
@@ -57,8 +58,8 @@ export default function CadastrarCupom() {
             setCupons(cuponsCadastrados);
             alert('Cupom cadastrado com sucesso!');
         }
-        setNome(''); // Limpa o campo após o cadastro
-        setValor(''); // Limpa o campo de valor após o cadastro
+        setNome(''); 
+        setValor(''); 
     };
 
     const editarCupom = (cupom) => {
@@ -103,6 +104,7 @@ export default function CadastrarCupom() {
     }
 
     return (
+        <Pagina>
         <Container className="my-5">
             <Row className="justify-content-center">
                 <Col md={6}>
@@ -183,5 +185,6 @@ export default function CadastrarCupom() {
                 </Modal.Footer>
             </Modal>
         </Container>
+        </Pagina>
     );
 }
