@@ -17,18 +17,18 @@ export default function Page() {
     const [mostrarModal, setMostrarModal] = useState(false);
     const [numeroCasa, setNumeroCasa] = useState('');
     const [complemento, setComplemento] = useState('');
-    const [loading, setLoading] = useState(true); 
-    const [isRedirecting, setIsRedirecting] = useState(false); 
+    const [loading, setLoading] = useState(true);
+    const [isRedirecting, setIsRedirecting] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
-        const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado')); 
+        const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado'));
 
         if (!usuarioLogado) {
-            
-            setIsRedirecting(true); 
-            router.push('/login'); 
-            return; 
+
+            setIsRedirecting(true);
+            router.push('/login');
+            return;
         }
 
         const carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
@@ -41,7 +41,7 @@ export default function Page() {
             return acc;
         }, {});
         setProdutosCarrinho(Object.values(produtosConsolidados));
-        setLoading(false); 
+        setLoading(false);
     }, [router]);
 
     const adicionarAoCarrinho = (produto) => {
@@ -127,7 +127,7 @@ export default function Page() {
                     setEndereco(`${data.logradouro}, ${data.bairro}, ${data.localidade} - ${data.uf}`);
                     const valorFrete = 15.00;
                     setFrete(valorFrete);
-                   
+
                     localStorage.setItem('endereco', JSON.stringify({
                         logradouro: data.logradouro,
                         bairro: data.bairro,
@@ -309,19 +309,35 @@ export default function Page() {
                     <Form>
                         <Form.Group className="mb-3">
                             <Form.Label>Logradouro</Form.Label>
-                            <Form.Control type="text" value={JSON.parse(localStorage.getItem('endereco')).logradouro} readOnly />
+                            <Form.Control
+                                type="text"
+                                value={JSON.parse(localStorage.getItem('endereco'))?.logradouro || ''}
+                                readOnly
+                            />
                         </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Label>Bairro</Form.Label>
-                            <Form.Control type="text" value={JSON.parse(localStorage.getItem('endereco')).bairro} readOnly />
+                            <Form.Control
+                                type="text"
+                                value={JSON.parse(localStorage.getItem('endereco'))?.bairro || ''}
+                                readOnly
+                            />
                         </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Label>Localidade</Form.Label>
-                            <Form.Control type="text" value={JSON.parse(localStorage.getItem('endereco')).localidade} readOnly />
+                            <Form.Control
+                                type="text"
+                                value={JSON.parse(localStorage.getItem('endereco'))?.localidade || ''}
+                                readOnly
+                            />
                         </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Label>UF</Form.Label>
-                            <Form.Control type="text" value={JSON.parse(localStorage.getItem('endereco')).uf} readOnly />
+                            <Form.Control
+                                type="text"
+                                value={JSON.parse(localStorage.getItem('endereco'))?.uf || ''}
+                                readOnly
+                            />
                         </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Label>Nº da Casa/Apartamento/Lote</Form.Label>
