@@ -1,11 +1,12 @@
-'use client'; 
+'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation'; 
+import { useRouter } from 'next/navigation';
 import { Form, Button, Container, Row, Col, Card, Alert, Spinner, Modal } from 'react-bootstrap';
-import { FaPlus, FaTrash } from 'react-icons/fa'; 
+import { FaPlus, FaTrash, FaUpload } from 'react-icons/fa';
 import Pagina from '@/app/components/Pagina';
 import Select from 'react-select';
+import Papa from 'papaparse';
 
 
 export default function CadastrarProduto() {
@@ -19,7 +20,7 @@ export default function CadastrarProduto() {
     urlAdicional3: '',
     marca: '',
     categoria: '',
-    tamanho: '' 
+    tamanho: ''
   });
 
   const [usuarioMaster, setUsuarioMaster] = useState(null);
@@ -37,7 +38,7 @@ export default function CadastrarProduto() {
   const [modalConfirmacaoVisible, setModalConfirmacaoVisible] = useState(false);
   const [produtoParaExcluir, setProdutoParaExcluir] = useState(null);
 
-  const router = useRouter(); 
+  const router = useRouter();
 
   useEffect(() => {
     const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado'));
@@ -49,6 +50,82 @@ export default function CadastrarProduto() {
 
 
   }, []);
+
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0]; // Obtém o arquivo selecionado
+    if (!file) return;
+
+    // Usa o PapaParse para ler o arquivo CSV
+    Papa.parse(file, {
+      header: true, // Para usar a primeira linha como cabeçalho
+      skipEmptyLines: true, // Pula as linhas vazias
+      complete: function (results) {
+        const produtosCSV = results.data; // Resultados do CSV
+        const produtosCadastrados = JSON.parse(localStorage.getItem('produtos')) || [];
+        const marcasCadastradas = JSON.parse(localStorage.getItem('marcas')) || [];
+        const categoriasCadastradas = JSON.parse(localStorage.getItem('categorias')) || [];
+        const tamanhosCadastrados = JSON.parse(localStorage.getItem('tamanhos')) || [];
+
+        // Função auxiliar para verificar se um item já existe em uma lista
+        const itemExiste = (lista, chave, valor) => lista.some(item => item[chave] === valor);
+
+        // Concatena os produtos do CSV com os já cadastrados
+        const novosProdutos = produtosCadastrados.concat(produtosCSV.map((produto, index) => {
+          // Verifica e cadastra a marca se não existir
+          if (!itemExiste(marcasCadastradas, 'nome', produto.marca)) {
+            const novaMarca = { id: marcasCadastradas.length + 1, nome: produto.marca };
+            marcasCadastradas.push(novaMarca);
+          }
+
+          // Verifica e cadastra a categoria se não existir
+          if (!itemExiste(categoriasCadastradas, 'nome', produto.categoria)) {
+            const novaCategoria = { id: categoriasCadastradas.length + 1, nome: produto.categoria };
+            categoriasCadastradas.push(novaCategoria);
+          }
+
+          // Verifica e cadastra o tamanho se não existir
+          if (!itemExiste(tamanhosCadastrados, 'tamanho', produto.tamanho)) {
+            const novoTamanho = { id: tamanhosCadastrados.length + 1, tamanho: produto.tamanho };
+            tamanhosCadastrados.push(novoTamanho);
+          }
+
+          return {
+            id: produtosCadastrados.length + index + 1,
+            nome: produto.nome,
+            valor: produto.valor,
+            valorOriginal: produto.valorOriginal,
+            urlPrincipal: produto.urlPrincipal,
+            urlAdicional1: produto.urlAdicional1,
+            urlAdicional2: produto.urlAdicional2,
+            urlAdicional3: produto.urlAdicional3,
+            marca: produto.marca,
+            categoria: produto.categoria,
+            tamanho: produto.tamanho,
+            imagensAdicionais: [produto.urlAdicional1, produto.urlAdicional2, produto.urlAdicional3] // Adiciona as URLs adicionais
+          };
+        }));
+
+        // Atualiza as listas de marcas, categorias e tamanhos no localStorage
+        localStorage.setItem('marcas', JSON.stringify(marcasCadastradas));
+        localStorage.setItem('categorias', JSON.stringify(categoriasCadastradas));
+        localStorage.setItem('tamanhos', JSON.stringify(tamanhosCadastrados));
+
+        // Salva os novos produtos no localStorage
+        localStorage.setItem('produtos', JSON.stringify(novosProdutos));
+        setProdutos(novosProdutos);
+        setMarcas(marcasCadastradas);
+        setCategorias(categoriasCadastradas);
+        setTamanhos(tamanhosCadastrados);
+
+        alert('Produtos importados e dados atualizados com sucesso!');
+      },
+      error: function (err) {
+        alert('Erro ao processar o arquivo CSV: ' + err.message);
+      }
+    });
+  };
+
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -79,7 +156,7 @@ export default function CadastrarProduto() {
       urlPrincipal: produto.urlPrincipal,
       marca: produto.marca,
       categoria: produto.categoria,
-      tamanho: produto.tamanho || '', 
+      tamanho: produto.tamanho || '',
       urlAdicional1: produto.imagensAdicionais[0] || '',
       urlAdicional2: produto.imagensAdicionais[1] || '',
       urlAdicional3: produto.imagensAdicionais[2] || ''
@@ -148,6 +225,39 @@ export default function CadastrarProduto() {
     );
   }
 
+  // Função para formatar número como moeda
+  const formatarValor = (valor) => {
+    const cleanValue = valor.replace(/[^\d]/g, ''); // Remove caracteres não numéricos
+    if (cleanValue.length === 0) return '';
+
+    // Converte para float e divide por 100 para transformar em valor monetário
+    const floatValue = parseFloat(cleanValue) / 100;
+
+    // Formata o número com 2 casas decimais
+    return new Intl.NumberFormat('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(floatValue);
+  };
+
+  // Função para lidar com a mudança do valor
+  const handleValueChange = (e, field) => {
+    const { value } = e.target;
+
+    // Atualiza o estado do formData com o valor digitado
+    setFormData({ ...formData, [field]: value });
+
+    // Formata o valor
+    const formattedValue = formatarValor(value);
+    setFormData((prevState) => ({ ...prevState, [field]: formattedValue }));
+  };
+
+  const handleBlur = (field) => {
+    const cleanValue = formData[field].replace(',', '.'); // Substitui a vírgula pelo ponto
+    const numberValue = parseFloat(cleanValue.replace(/[^\d.-]/g, '')); // Remove tudo exceto números e ponto
+    setFormData({ ...formData, [field]: isNaN(numberValue) ? '' : formatarNumero(numberValue) });
+  };
+
   return (
     <Pagina>
       <Container className="my-5">
@@ -158,7 +268,7 @@ export default function CadastrarProduto() {
               {usuarioMaster ? (
                 <>
                   <Form onSubmit={handleSubmit}>
-                    {['nome', 'valor', 'valorOriginal', 'urlPrincipal', 'urlAdicional1', 'urlAdicional2', 'urlAdicional3'].map((campo, index) => (
+                    {['nome', 'urlPrincipal', 'urlAdicional1', 'urlAdicional2', 'urlAdicional3'].map((campo, index) => (
                       <Form.Group className="mb-3" key={index}>
                         <Form.Label>{campo.charAt(0).toUpperCase() + campo.slice(1).replace(/([A-Z])/g, ' $1')}</Form.Label>
                         <Form.Control
@@ -170,6 +280,27 @@ export default function CadastrarProduto() {
                         />
                       </Form.Group>
                     ))}
+                    <Form.Group className="mb-3">
+                      <Form.Label>Valor</Form.Label>
+                      <Form.Control
+                        type="text"
+                        value={formData.valor}
+                        onChange={(e) => handleValueChange(e, 'valor')}
+                        required
+                        placeholder="Ex: 100.00"
+                      />
+                    </Form.Group>
+
+                    <Form.Group className="mb-3">
+                      <Form.Label>Valor Original</Form.Label>
+                      <Form.Control
+                        type="text"
+                        value={formData.valorOriginal}
+                        onChange={(e) => handleValueChange(e, 'valorOriginal')}
+                        required
+                        placeholder="Ex: 200.00"
+                      />
+                    </Form.Group>
                     <Form.Group className="mb-3 d-flex align-items-center">
                       <Form.Label className="me-2">Marca</Form.Label>
                       <div className="flex-grow-1">
@@ -218,6 +349,22 @@ export default function CadastrarProduto() {
                       </Button>
                     </Form.Group>
 
+                    {/* Botão para upload de CSV */}
+                    <Form.Group className="mb-3">
+                      <Form.Label>Importar Produtos via CSV</Form.Label>
+                      <div className="d-flex align-items-center">
+                        <Button as="label" variant="primary" className="me-3">
+                          <FaUpload className="me-2" /> Upload CSV
+                          <input
+                            type="file"
+                            accept=".csv"
+                            style={{ display: 'none' }}
+                            onChange={handleFileUpload}
+                          />
+                        </Button>
+                        <span className="text-muted">Selecione um arquivo CSV</span>
+                      </div>
+                    </Form.Group>
 
                     <Button variant="primary" type="submit" className="w-100 mb-2">
                       {produtoSelecionado ? 'Salvar Produto' : 'Cadastrar Produto'}
