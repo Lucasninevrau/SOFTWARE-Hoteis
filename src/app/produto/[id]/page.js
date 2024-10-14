@@ -3,34 +3,36 @@
 import Pagina from "@/app/components/Pagina";
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation"; 
-import { Button, Carousel, Col, Form, Image, Row } from "react-bootstrap";
-import { BsHeart } from "react-icons/bs";
+import { Button, Carousel, Col, Form, Image, Row, Alert } from "react-bootstrap";
+import { BsHeart, BsHeartFill } from "react-icons/bs";
 
 export default function Page() {
   const [produto, setProduto] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [tamanhoSelecionado, setTamanhoSelecionado] = useState('');
   const [quantidade, setQuantidade] = useState(1);
-  const [tamanhos, setTamanhos] = useState([]); // Estado para tamanhos
+  const [tamanhos, setTamanhos] = useState([]);
+  const [listaDesejos, setListaDesejos] = useState([]); // Estado para a lista de desejos
+  const [mensagem, setMensagem] = useState(''); // Estado para a mensagem de sucesso
   const router = useRouter();
   const { id } = useParams(); 
 
   useEffect(() => {
-    // Carregar produto do localStorage com base no ID
     const produtos = JSON.parse(localStorage.getItem('produtos')) || [];
     const produtoEncontrado = produtos.find(produto => produto.id === parseInt(id));
 
     if (produtoEncontrado) {
       setProduto(produtoEncontrado);
-      setTamanhoSelecionado(produtoEncontrado.tamanho || ''); // Define o tamanho selecionado com base no produto, se existir
+      setTamanhoSelecionado(produtoEncontrado.tamanho || '');
     } else {
-      // Redireciona para a página inicial se o produto não for encontrado
       router.push('/');
     }
 
-    // Carregar tamanhos do localStorage
     const tamanhosSalvos = JSON.parse(localStorage.getItem('tamanhos')) || [];
     setTamanhos(tamanhosSalvos);
+
+    const desejosSalvos = JSON.parse(localStorage.getItem('listaDesejos')) || [];
+    setListaDesejos(desejosSalvos);
   }, [id, router]);
 
   const handleSelect = (selectedIndex) => {
@@ -38,45 +40,57 @@ export default function Page() {
   };
 
   const adicionarAoCarrinho = () => {
-    // Monta o objeto do produto para adicionar ao carrinho
     const produtoCarrinho = {
       ...produto,
-      tamanho: tamanhoSelecionado, // Adiciona o tamanho selecionado
-      quantidade: quantidade // Adiciona a quantidade selecionada
+      tamanho: tamanhoSelecionado,
+      quantidade: quantidade
     };
 
-    // Obtém o carrinho existente do localStorage ou inicia um novo array
     const carrinhoExistente = JSON.parse(localStorage.getItem('carrinho')) || [];
-
-    // Verifica se o produto já existe no carrinho
     const produtoExistente = carrinhoExistente.find(item => 
-        item.id === produtoCarrinho.id &&
-        item.tamanho === produtoCarrinho.tamanho &&
-        item.nome === produtoCarrinho.nome
+      item.id === produtoCarrinho.id &&
+      item.tamanho === produtoCarrinho.tamanho &&
+      item.nome === produtoCarrinho.nome
     );
 
     if (produtoExistente) {
-        // Se o produto já existe, apenas aumenta a quantidade
-        produtoExistente.quantidade += quantidade; // Acumula a quantidade
+      produtoExistente.quantidade += quantidade;
     } else {
-        // Se o produto não existe, adiciona ao carrinho
-        carrinhoExistente.push(produtoCarrinho);
+      carrinhoExistente.push(produtoCarrinho);
     }
 
-    // Atualiza o localStorage com o novo carrinho
     localStorage.setItem('carrinho', JSON.stringify(carrinhoExistente));
-
-    console.log(`Produto adicionado ao carrinho:`, produtoCarrinho);
     router.push('/carrinho');
-};
+  };
 
+  const handleDesejoClick = () => {
+    let novaListaDesejos = [...listaDesejos];
+    const jaNaLista = listaDesejos.some(item => item.id === produto.id);
+
+    if (jaNaLista) {
+      novaListaDesejos = novaListaDesejos.filter(item => item.id !== produto.id);
+      setMensagem('Item removido da lista de desejos.');
+    } else {
+      novaListaDesejos.push(produto);
+      setMensagem('Item adicionado à lista de desejos!');
+    }
+
+    setListaDesejos(novaListaDesejos);
+    localStorage.setItem('listaDesejos', JSON.stringify(novaListaDesejos));
+
+    // Remover a mensagem após 3 segundos
+    setTimeout(() => {
+      setMensagem('');
+    }, 3000);
+  };
+
+  const estaNaListaDesejos = listaDesejos.some(item => item.id === produto?.id);
 
   if (!produto) {
     return <div>Carregando...</div>;
   }
 
-  // Verifique se as imagens estão corretamente referenciadas
-  const imagens = [produto.urlPrincipal, ...produto.imagensAdicionais]; // Acessando a imagem principal e as adicionais
+  const imagens = [produto.urlPrincipal, ...produto.imagensAdicionais];
 
   return (
     <Pagina>
@@ -121,6 +135,9 @@ export default function Page() {
           <p style={{ marginTop: '1px', fontWeight: 'bold', fontSize: '2rem' }}>R$: {produto.valor}</p>
           <p>ou 3x de R$: {(produto.valor / 3).toFixed(2)}</p>
 
+          {/* Mensagem de confirmação */}
+          {mensagem && <Alert variant="success">{mensagem}</Alert>}
+
           {/* Escolher Tamanho */}
           <Form.Group as={Row} className="mb-3">
             <Form.Label column sm={3}>Tamanho</Form.Label>
@@ -153,17 +170,28 @@ export default function Page() {
 
           <Button variant="success" className="w-100 mb-3" onClick={adicionarAoCarrinho}>Adicionar ao Carrinho</Button>
           <Button variant="secondary" className="w-100" onClick={() => router.push('/')}>Continuar Comprando</Button>
-          <BsHeart
-            className="heart-icon w-100 mb-3 mt-4"
-            size={25}
-            onClick={() => alert(':)')}
-            style={{
-              color: '#000',
-              transition: 'color 0.5s ease',
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = 'red'}
-            onMouseLeave={(e) => e.currentTarget.style.color = '#000'}
-          />
+          
+          {estaNaListaDesejos ? (
+            <BsHeartFill
+              className="heart-icon w-100 mb-3 mt-4"
+              size={25}
+              onClick={handleDesejoClick}
+              style={{
+                color: 'red',
+                cursor: 'pointer',
+              }}
+            />
+          ) : (
+            <BsHeart
+              className="heart-icon w-100 mb-3 mt-4"
+              size={25}
+              onClick={handleDesejoClick}
+              style={{
+                color: '#000',
+                cursor: 'pointer',
+              }}
+            />
+          )}
         </Col>
       </Row>
     </Pagina>
