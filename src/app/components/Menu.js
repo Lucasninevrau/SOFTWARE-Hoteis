@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
-import { BsCart2, BsClipboard, BsHeart, BsPersonCircle } from "react-icons/bs";
+import { BsCart2, BsClipboard, BsHeart, BsPersonCircle, BsSearch } from "react-icons/bs";
 import Select from 'react-select';
+import { useRouter } from 'next/navigation'; // Importando o useRouter
 
 export default function Menu() {
     const [usuarioLogado, setUsuarioLogado] = useState(null);
     const [produtos, setProdutos] = useState([]);
+    const [filteredProdutos, setFilteredProdutos] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const router = useRouter();
 
     useEffect(() => {
         const usuario = JSON.parse(localStorage.getItem('usuarioLogado'));
@@ -15,7 +18,15 @@ export default function Menu() {
         }
 
         const produtosCadastrados = JSON.parse(localStorage.getItem('produtos')) || [];
-        setProdutos(produtosCadastrados.map(produto => ({ value: produto.nome, label: produto.nome, urlPrincipal: produto.urlPrincipal })));
+        const formattedProdutos = produtosCadastrados.map(produto => ({
+            value: produto.nome,
+            label: produto.nome,
+            urlPrincipal: produto.urlPrincipal,
+            id: produto.id,
+            produtoCompleto: produto
+        }));
+        setProdutos(formattedProdutos);
+        setFilteredProdutos(formattedProdutos);
     }, []);
 
     const handleLogout = () => {
@@ -23,11 +34,28 @@ export default function Menu() {
         setUsuarioLogado(null);
     };
 
+    const handleInputChange = (inputValue) => {
+        setSearchTerm(inputValue);
+        if (inputValue) {
+            const filtered = produtos.filter(produto =>
+                produto.label.toLowerCase().includes(inputValue.toLowerCase())
+            );
+            setFilteredProdutos(filtered);
+        } else {
+            setFilteredProdutos(produtos);
+        }
+    };
+
     const handleSearchChange = (selectedOption) => {
         if (selectedOption) {
-            setSearchTerm(selectedOption.value);
-        } else {
-            setSearchTerm('');
+            router.push(`/produto/${selectedOption.id}`);
+        }
+    };
+
+    const handleSearchClick = () => {
+        // Redireciona para o primeiro produto filtrado se houver
+        if (filteredProdutos.length > 0) {
+            router.push(`/produto/${filteredProdutos[0].id}`);
         }
     };
 
@@ -57,11 +85,12 @@ export default function Menu() {
 
                     <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                     <Navbar.Collapse id="responsive-navbar-nav" className="justify-content-center">
-                        <div style={{ flex: 1, display: 'flex', justifyContent: 'center', width: '100%' }}>
+                        <div style={{ flex: 1, display: 'flex', justifyContent: 'center', width: '100%', position: 'relative' }}>
                             <div style={{ maxWidth: '400px', width: '100%' }}>
                                 <Select
-                                    options={produtos}
+                                    options={filteredProdutos}
                                     onChange={handleSearchChange}
+                                    onInputChange={handleInputChange}
                                     placeholder="Pesquisar produtos"
                                     isClearable
                                     isSearchable
@@ -70,11 +99,23 @@ export default function Menu() {
                                     styles={{
                                         control: (provided) => ({
                                             ...provided,
+                                            paddingLeft: '40px', // espaço para a lupa
                                             borderColor: 'white',
                                             backgroundColor: 'white',
+                                            position: 'relative' // permite posicionar a lupa
+                                        }),
+                                        dropdownIndicator: (provided) => ({
+                                            ...provided,
+                                            display: 'none' // esconder o indicador padrão
+                                        }),
+                                        indicatorsContainer: (provided) => ({
+                                            ...provided,
+                                            cursor: 'pointer' // faz o cursor mudar para pointer
                                         }),
                                     }}
                                 />
+                               
+                              
                             </div>
                         </div>
 
@@ -83,14 +124,12 @@ export default function Menu() {
                                 <BsHeart className="mx-2" size={25} /> Lista de Desejo
                             </Nav.Link>
 
-
                             <Nav.Link href="/carrinho" className="d-none d-lg-block">
                                 <BsCart2 className="mx-3" size={30} /> Carrinho
                             </Nav.Link>
 
-                            {/* Menu Dropdown para Cadastros */}
                             {usuarioLogado === 'master' && (
-                                <NavDropdown title={<><BsClipboard className="me-2" size={25} /> Cadastros</>} id="nav-dropdown" >
+                                <NavDropdown title={<><BsClipboard className="me-2" size={25} /> Cadastros</>} id="nav-dropdown">
                                     <NavDropdown.Item href="/cadastro/produtos">Cadastrar Produto</NavDropdown.Item>
                                     <NavDropdown.Item href="/cadastro/categorias">Cadastrar Categoria</NavDropdown.Item>
                                     <NavDropdown.Item href="/cadastro/marcas">Cadastrar Marca</NavDropdown.Item>
@@ -98,7 +137,7 @@ export default function Menu() {
                                     <NavDropdown.Item href="/cadastro/cupons">Cadastrar Cupom</NavDropdown.Item>
                                 </NavDropdown>
                             )}
-                            
+
                             <NavDropdown title={<><BsPersonCircle className="mx-2" size={25} />{usuarioLogado ? usuarioLogado : 'Entrar'}</>} id="nav-dropdown">
                                 {usuarioLogado ? (
                                     <>
@@ -113,7 +152,6 @@ export default function Menu() {
                                 )}
                             </NavDropdown>
 
-                            {/* Ícones visíveis no mobile */}
                             <Nav.Link href="/listadesejos" className="d-lg-none">
                                 <BsHeart className="mx-2" size={25} />
                             </Nav.Link>
