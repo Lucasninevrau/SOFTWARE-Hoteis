@@ -234,9 +234,10 @@ export default function Page() {
                             <Row className="mb-2">
                                 <Col><strong>Valor Final:</strong></Col>
                                 <Col className="text-end">R$: {(
-                                    produtosCarrinho.reduce((acc, item) => acc + (item.quantidade || 1) * item.valor, 0)
+                                    produtosCarrinho.reduce((acc, item) => acc + (item.quantidade || 1) * parseFloat(item.valor.replace(',', '.')), 0)
                                     - desconto + frete
-                                ).toFixed(2)}</Col>
+                                ).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace('.', ',')}</Col>
+
                             </Row>
                             <Row className="mb-3">
                                 <Col>

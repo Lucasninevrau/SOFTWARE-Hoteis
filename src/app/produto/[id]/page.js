@@ -2,7 +2,7 @@
 
 import Pagina from "@/app/components/Pagina";
 import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation"; 
+import { useRouter, useParams } from "next/navigation";
 import { Button, Carousel, Col, Form, Image, Row, Alert } from "react-bootstrap";
 import { BsHeart, BsHeartFill } from "react-icons/bs";
 
@@ -15,7 +15,7 @@ export default function Page() {
   const [listaDesejos, setListaDesejos] = useState([]); // Estado para a lista de desejos
   const [mensagem, setMensagem] = useState(''); // Estado para a mensagem de sucesso
   const router = useRouter();
-  const { id } = useParams(); 
+  const { id } = useParams();
 
   useEffect(() => {
     const produtos = JSON.parse(localStorage.getItem('produtos')) || [];
@@ -47,7 +47,7 @@ export default function Page() {
     };
 
     const carrinhoExistente = JSON.parse(localStorage.getItem('carrinho')) || [];
-    const produtoExistente = carrinhoExistente.find(item => 
+    const produtoExistente = carrinhoExistente.find(item =>
       item.id === produtoCarrinho.id &&
       item.tamanho === produtoCarrinho.tamanho &&
       item.nome === produtoCarrinho.nome
@@ -133,7 +133,9 @@ export default function Page() {
           <h1>{produto.nome}</h1>
           <p style={{ margin: 0, color: '#888' }}>A partir de</p>
           <p style={{ marginTop: '1px', fontWeight: 'bold', fontSize: '2rem' }}>R$: {produto.valor}</p>
-          <p>ou 3x de R$: {(produto.valor / 3).toFixed(2)}</p>
+          <p>ou 3x de R$: {(parseFloat(produto.valor.replace(',', '.')) / 3).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace('.', ',')}</p>
+
+
 
           {/* Mensagem de confirmação */}
           {mensagem && <Alert variant="success">{mensagem}</Alert>}
@@ -170,7 +172,7 @@ export default function Page() {
 
           <Button variant="success" className="w-100 mb-3" onClick={adicionarAoCarrinho}>Adicionar ao Carrinho</Button>
           <Button variant="secondary" className="w-100" onClick={() => router.push('/')}>Continuar Comprando</Button>
-          
+
           {estaNaListaDesejos ? (
             <BsHeartFill
               className="heart-icon w-100 mb-3 mt-4"
