@@ -426,7 +426,7 @@ export default function CadastrarProduto() {
 
         </Row>
 
-        {/* Modal para adicionar marcas ou categorias */}
+        
         <Modal show={modalVisible} onHide={handleCloseModal}>
           <Modal.Header closeButton>
             <Modal.Title>
